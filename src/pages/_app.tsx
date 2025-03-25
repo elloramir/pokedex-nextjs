@@ -1,3 +1,4 @@
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import "../styles/global.css";
 import { Roboto } from "next/font/google";
 

@@ -5,6 +5,23 @@
 .title {
     color: #333652;
     font-size: 18px;
+    width: auto;
+    display: inline-block;
+    border: none;
+    outline: none;
+}
+
+.title[contenteditable="true"] {
+    background-color: #d1d1d1;
+}
+
+.editButton {
+    background: none;
+    border: none;
+    color: #333652;
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 15px;
 }
 
 .slotContainer {

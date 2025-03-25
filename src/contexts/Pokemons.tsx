@@ -1,7 +1,6 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect, useRef } from 'react';
 
-// Definindo o tipo do Pokémon
-export interface PokemonType {
+interface PokemonType {
     id: number;
     name: string;
     number: number;
@@ -10,8 +9,7 @@ export interface PokemonType {
     selected: boolean;
 }
 
-// Definindo o tipo do slot da equipe
-export interface TeamSlot {
+interface TeamSlot {
     id: number;
     pokemon?: PokemonType;
 }
@@ -142,13 +140,16 @@ export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children })
         );
     };
 
+    const teamName = useRef('My Team');
+
     return (
         <PokemonContext.Provider value={{
             availablePokemons,
             teamSlots,
             addPokemonToTeam,
             removePokemonFromTeam,
-            togglePokemonSelection
+            togglePokemonSelection,
+            teamName,
         }}>
             {children}
         </PokemonContext.Provider>
