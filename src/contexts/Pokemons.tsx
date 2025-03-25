@@ -70,25 +70,43 @@ export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children })
     }, []);
 
     const addPokemonToTeam = (pokemon: PokemonType, slotId: number) => {
+        // Primeiro, vamos identificar se o slot alvo já tem um Pokémon diferente
+        const targetSlot = teamSlots.find(slot => slot.id === slotId);
+        const overwrittenPokemonId = targetSlot?.pokemon && targetSlot.pokemon.id !== pokemon.id
+            ? targetSlot.pokemon.id
+            : null;
+    
+        // Remover o Pokémon das demais posições caso ele já esteja em algum slot
         setTeamSlots(prevSlots => 
-            prevSlots.map(slot => {
-                if (slot.pokemon?.id === pokemon.id)
-                    slot.pokemon = null;
-
-                if (slot.id === slotId) {
-                    return { ...slot, pokemon: pokemon };
-                }
-
-                return slot;
-            })
+            prevSlots.map(slot => 
+                slot.pokemon?.id === pokemon.id
+                    ? { ...slot, pokemon: undefined }
+                    : slot
+            )
         );
-
-        // Atualiza o pokemon como selecionado
-        setAvailablePokemons(prevPokemons => 
-            prevPokemons.map(p => 
-                p.id === pokemon.id 
-                    ? { ...p, selected: true } 
-                    : p
+    
+        // Atualizar o slot alvo com o novo Pokémon
+        setTeamSlots(prevSlots =>
+            prevSlots.map(slot =>
+                slot.id === slotId
+                    ? { ...slot, pokemon: pokemon }
+                    : slot
+            )
+        );
+    
+        // Se houver um Pokémon sobrescrito, atualize-o para "selected: false"
+        if (overwrittenPokemonId) {
+            setAvailablePokemons(prevPokemons =>
+                prevPokemons.map(p =>
+                    p.id === overwrittenPokemonId ? { ...p, selected: false } : p
+                )
+            );
+        }
+    
+        // Atualiza o novo Pokémon como selecionado
+        setAvailablePokemons(prevPokemons =>
+            prevPokemons.map(p =>
+                p.id === pokemon.id ? { ...p, selected: true } : p
             )
         );
     };
