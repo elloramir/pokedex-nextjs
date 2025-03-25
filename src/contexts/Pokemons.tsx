@@ -141,6 +141,7 @@ export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children })
     };
 
     const teamName = useRef('My Team');
+    const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
 
     return (
         <PokemonContext.Provider value={{
@@ -150,6 +151,8 @@ export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children })
             removePokemonFromTeam,
             togglePokemonSelection,
             teamName,
+            selectedSlotId,
+            setSelectedSlotId,
         }}>
             {children}
         </PokemonContext.Provider>

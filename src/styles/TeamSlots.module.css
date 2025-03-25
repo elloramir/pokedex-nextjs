@@ -44,6 +44,8 @@
 }
 
 .slot {
+    box-sizing: content-box;
+    border: 5px solid transparent;
     width: calc(100%/4);
     max-width: 90px;
     position: relative;
@@ -52,10 +54,16 @@
 
 .slotObject {
     position: absolute;
+    pointer-events: none;
     z-index: 0;
 }
 
 .slot img {
     cursor: grab;
     z-index: 1;
+}
+
+.selectedSlot {
+    border: 5px dashed #4ecaf0;
+    border-radius: 50%;
 }

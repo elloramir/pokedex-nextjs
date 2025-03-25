@@ -4,7 +4,8 @@ import { usePokemonsContext } from '../contexts/Pokemons'; // Adjust the import 
 import styles from '../styles/TeamOptions.module.css';
 
 export const TeamOptions: React.FC = () => {
-    const { teamSlots } = usePokemonsContext();
+    const { teamSlots, selectedSlotId, removePokemonFromTeam } = usePokemonsContext();
+    
 
     // Check if all 6 team slots are filled
     const isTeamComplete = teamSlots.every(slot => slot.pokemon !== undefined);
@@ -12,8 +13,9 @@ export const TeamOptions: React.FC = () => {
     return (
         <div className={styles.options}>
             <button 
-                className={`${styles.buttonImage} ${styles.danger} ${styles.disabled}`}
+                className={`${styles.buttonImage} ${styles.danger} ${selectedSlotId === null ? styles.disabled : ''}`}
                 aria-label="Delete Team"
+                onClick={() => removePokemonFromTeam(selectedSlotId!)}
             >
                 <Image 
                     src="/images/delete.png" 
