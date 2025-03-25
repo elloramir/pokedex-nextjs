@@ -1,0 +1,32 @@
+.teams {
+    margin-top: 15px;
+}
+
+.title {
+    color: #333652;
+    font-size: 18px;
+}
+
+.slotContainer {
+    margin-top: 30px;
+}
+
+.slotGroup {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.slotGroup:first-of-type {
+    justify-content: center;
+}
+
+.slotGroup:nth-of-type(2) {
+    justify-content: flex-end;
+}
+
+.slot {
+    width: calc(100%/4);
+    max-width: 90px;
+}
