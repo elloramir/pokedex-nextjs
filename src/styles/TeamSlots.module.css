@@ -29,4 +29,16 @@
 .slot {
     width: calc(100%/4);
     max-width: 90px;
+    position: relative;
+    height: 90px;
+}
+
+.slotObject {
+    position: absolute;
+    z-index: 0;
+}
+
+.slot img {
+    cursor: grab;
+    z-index: 1;
 }

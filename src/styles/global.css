@@ -10,15 +10,31 @@ html, body {
 }
 
 body {
-    background-color: #E9EAEB;
     overflow-x: hidden;
 }
 
+/* Estiliza a barra de rolagem para navegadores baseados em WebKit (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+    width: 6px; /* Largura da barra */
+}
+
+/* Fundo da barra de rolagem (opcional, aqui deixado transparente) */
+::-webkit-scrollbar-track {
+    background: transparent; /* Sem fundo */
+}
+
+/* Estilização do "polegar" da barra de rolagem */
+::-webkit-scrollbar-thumb {
+    background: #c4c4c4; /* Cor da barra */
+    border-radius: 3px; /* Borda arredondada */
+}
+
 .app {
-    max-width: 500px;
+    max-width: 450px;
     margin: 0 auto;
     height: 100vh;
     overflow-y: auto;
+    background-color: #E9EAEB;
 }
 
 .content {

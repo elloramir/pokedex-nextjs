@@ -1,76 +1,125 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 
-
+// Definindo o tipo do Pokémon
 export interface PokemonType {
     id: number;
     name: string;
     number: number;
     imageUrl: string;
     types: string[];
+    selected: boolean;
 }
 
+// Definindo o tipo do slot da equipe
 export interface TeamSlot {
     id: number;
     pokemon?: PokemonType;
 }
-
-
-const initialAvailablePokemons: PokemonType[] = [
-    {
-        id: 1,
-        name: 'Bulbasaur',
-        number: 1,
-        imageUrl: 'https://i.imgur.com/ROHzrQz.png',
-        types: ['grass', 'poison']
-    },
-    {
-        id: 2,
-        name: 'Charmander',
-        number: 2,
-        imageUrl: 'https://i.imgur.com/ROHzrQz.png',
-        types: ['fire']
-    },
-];
 
 interface PokemonContextType {
     availablePokemons: PokemonType[];
     teamSlots: TeamSlot[];
     addPokemonToTeam: (pokemon: PokemonType, slotId: number) => void;
     removePokemonFromTeam: (slotId: number) => void;
+    togglePokemonSelection: (pokemonId: number) => void;
 }
 
 const PokemonContext = createContext<PokemonContextType | undefined>(undefined);
 
+// Função para buscar pokémons da PokeAPI
+const fetchPokemons = async () => {
+    const pokemons: PokemonType[] = [];
+    const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=36');
+    const data = await response.json();
+    
+    for (const pokemon of data.results) {
+        const pokemonDetails = await fetch(pokemon.url);
+        const details = await pokemonDetails.json();
+
+        if (details.id % 3 === 0) {
+            const newPokemon: PokemonType = {
+                id: details.id,
+                name: details.name,
+                number: details.id,
+                imageUrl: details.sprites.front_default,
+                types: details.types.map((typeInfo: any) => typeInfo.type.name),
+                selected: false
+            };
+            
+            pokemons.push(newPokemon);
+        }
+    }
+    return pokemons;
+};
+
 export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [availablePokemons, setAvailablePokemons] = useState<PokemonType[]>(initialAvailablePokemons);
+    const [availablePokemons, setAvailablePokemons] = useState<PokemonType[]>([]);
     const [teamSlots, setTeamSlots] = useState<TeamSlot[]>([
         { id: 1 }, { id: 2 }, { id: 3 },
         { id: 4 }, { id: 5 }, { id: 6 }
     ]);
 
+    // Efeito para carregar os pokémons assim que o componente for montado
+    useEffect(() => {
+        const loadPokemons = async () => {
+            const pokemons = await fetchPokemons();
+            setAvailablePokemons(pokemons);
+        };
+
+        loadPokemons();
+    }, []);
+
     const addPokemonToTeam = (pokemon: PokemonType, slotId: number) => {
-        // Update team slots
         setTeamSlots(prevSlots => 
-            prevSlots.map(slot =>  {
-                if (slot.pokemon?.id === pokemon?.id)
+            prevSlots.map(slot => {
+                if (slot.pokemon?.id === pokemon.id)
                     slot.pokemon = null;
 
-                // @todo: make it unavaliable
                 if (slot.id === slotId) {
-                    return { ...slot, pokemon: pokemon } 
+                    return { ...slot, pokemon: pokemon };
                 }
 
                 return slot;
             })
         );
+
+        // Atualiza o pokemon como selecionado
+        setAvailablePokemons(prevPokemons => 
+            prevPokemons.map(p => 
+                p.id === pokemon.id 
+                    ? { ...p, selected: true } 
+                    : p
+            )
+        );
     };
 
     const removePokemonFromTeam = (slotId: number) => {
+        const pokemonToRemove = teamSlots.find(slot => slot.id === slotId)?.pokemon;
+
         setTeamSlots(prevSlots => 
             prevSlots.map(slot => 
-                slot.id === slotId 
-                    ? { ...slot, pokemon: undefined } 
-                    : slot
+                slot.id === slotId ? { ...slot, pokemon: undefined } : slot
+            )
+        );
+
+        // Remove a seleção do pokemon quando removido da equipe
+        if (pokemonToRemove) {
+            setAvailablePokemons(prevPokemons => 
+                prevPokemons.map(p => 
+                    p.id === pokemonToRemove.id 
+                        ? { ...p, selected: false } 
+                        : p
+                )
+            );
+        }
+    };
+
+    const togglePokemonSelection = (pokemonId: number) => {
+        setAvailablePokemons(prevPokemons => 
+            prevPokemons.map(pokemon => 
+                pokemon.id === pokemonId 
+                    ? { ...pokemon, selected: !pokemon.selected } 
+                    : pokemon
             )
         );
     };
@@ -80,12 +129,13 @@ export const PokemonProvider: React.FC<{ children: ReactNode }> = ({ children })
             availablePokemons,
             teamSlots,
             addPokemonToTeam,
-            removePokemonFromTeam
+            removePokemonFromTeam,
+            togglePokemonSelection
         }}>
             {children}
         </PokemonContext.Provider>
     );
 };
 
-// Custom hook for using the context
+// Custom hook para usar o contexto
 export const usePokemonsContext = () => useContext(PokemonContext);
