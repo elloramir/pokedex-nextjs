@@ -11,6 +11,11 @@
     outline: none;
 }
 
+.title:empty:before {
+    content: "My Team";
+    color: #8f8f8f; 
+}
+
 .title[contenteditable="true"] {
     background-color: #d1d1d1;
 }
@@ -61,9 +66,23 @@
 .slot img {
     cursor: grab;
     z-index: 1;
+    animation: elastic 0.5s ease;
+}
+
+@keyframes elastic {
+    0% { transform: scale(0.5); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shake {
+    0% { transform: rotate(15deg); }
+    50% { transform: rotate(-15deg); }
+    100% { transform: rotate(0deg); }
 }
 
 .selectedSlot {
     border: 5px dashed #4ecaf0;
     border-radius: 50%;
+    animation: shake 0.4s ease;
 }

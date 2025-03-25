@@ -35,6 +35,7 @@ body {
     height: 100vh;
     overflow-y: auto;
     background-color: #E9EAEB;
+    user-select: none;
 }
 
 .content {

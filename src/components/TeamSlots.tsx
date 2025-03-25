@@ -35,6 +35,10 @@ export const TeamSlots = () => {
 
   // Função para atualizar o nome da equipe
   const handleInput = (e) => {
+    if (e.currentTarget.textContent.length > 15) {
+      e.preventDefault();
+      return;
+    }
     teamName.current = e.currentTarget.textContent; // Atualiza o nome da equipe com o conteúdo editado
   };
 
@@ -44,6 +48,10 @@ export const TeamSlots = () => {
       // Ao pressionar Enter, desativa a edição
       setIsEditable(false);
       titleRef.current.blur(); // Remove o foco do título (finaliza a edição)
+    }
+
+    if (titleRef.current.textContent.length >= 30 && e.key !== 'Backspace') {
+      e.preventDefault();
     }
   };
 

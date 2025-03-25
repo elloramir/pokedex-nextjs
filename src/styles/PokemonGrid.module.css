@@ -28,7 +28,6 @@
     aspect-ratio: 1;
     margin-bottom: 30px;
     cursor: grab;
-    user-select: none;
 }
 
 .pokemonNumber {
@@ -44,6 +43,7 @@
     font-weight: bold;
     font-size: 13px;
     z-index: 10;
+    pointer-events: none;
 }
 
 .pokemonPreview {
