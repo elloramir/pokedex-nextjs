@@ -15,7 +15,7 @@ import { usePokemonsContext } from "@/contexts/Pokemons";
 export function SlotItem({ index }) {
 	const { slots, setActiveSlot, activeSlot, addPokemon, clearSlot } = useTeamContext();
 	const { selectPokemon, unselectPokemon, loadedPokemons } = usePokemonsContext();
-	const pokemon = loadedPokemons[slots[index] - 1];
+	const pokemon = loadedPokemons[slots[index]];
 	const svgRef = useRef(null);
 
 	// Handle pokemons dropped over us
@@ -23,17 +23,17 @@ export function SlotItem({ index }) {
 		e.preventDefault();
 
 		const pokemonData = e.dataTransfer.getData("text/plain");
-		const pokemonId = Number(pokemonData);
+		const pokemonIndex = Number(pokemonData);
 
 		// If we already have a pokemon on that slot
 		// we should remove it first!
 		if (pokemon) {
 			clearSlot(index);
-			unselectPokemon(pokemon.id);
+			unselectPokemon(pokemon.index);
 		}
 
-		selectPokemon(pokemonId);
-		addPokemon(index, pokemonId);
+		selectPokemon(pokemonIndex);
+		addPokemon(index, pokemonIndex);
 	};
 
 	function handleDragOver(e) {
@@ -41,12 +41,20 @@ export function SlotItem({ index }) {
 	}
 
 	function handleDragStart(e) {
-		e.dataTransfer.setData("text/plain", String(pokemon.id));
+		e.dataTransfer.setData("text/plain", String(pokemon.index));
 	};
 
 	// Allways clear it when moved-out
-	function handleDragEnd() {
+	function handleDragEnd(e) {
 		clearSlot(index);
+
+		// Check if we dopped the pokemon away.
+		// In that particular case we need to unset it since
+		// no other slot will do it for us, since we are throwing it
+		// out the slots boundaries (like a swip discard).
+		if (e.dataTransfer.dropEffect === "none") {
+        	unselectPokemon(pokemon.index);
+   		}
 	}
 
 	// Change svg color dynamicaly every time slots change

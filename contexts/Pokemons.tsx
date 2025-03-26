@@ -32,22 +32,25 @@ export function PokemonsProvider({ children }) {
 					});
 				}
 
-				setLoadedPokemons([...loadedPokemons, ...pokemons]);
+				const fused = [...loadedPokemons, ...pokemons];
+				const indexed = fused.map((pokemon, index) => Object({...pokemon, index}));
+
+				setLoadedPokemons(indexed);
 			});
 	}
 
-	function selectPokemon(id) {
+	function selectPokemon(index) {
 		setLoadedPokemons(loadedPokemons.map(pokemon => {
-			if (pokemon.id == id) {
+			if (pokemon.index == index) {
 				pokemon.selected = true;
 			}
 			return pokemon;
 		}));
 	}
 
-	function unselectPokemon(id) {
+	function unselectPokemon(index) {
 		setLoadedPokemons(loadedPokemons.map(pokemon => {
-			if (pokemon.id == id) {
+			if (pokemon.index == index) {
 				pokemon.selected = false;
 			}
 			return pokemon;

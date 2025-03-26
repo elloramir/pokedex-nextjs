@@ -36,7 +36,7 @@ export function Pokemons() {
         }
 
         // Set draggable data to our pokemon
-        e.dataTransfer?.setData('text/plain', String(pokemon.id));
+        e.dataTransfer?.setData('text/plain', String(pokemon.index));
     };
 
 
@@ -44,8 +44,8 @@ export function Pokemons() {
     function handleClick(pokemon) {
     	if (activeSlot) {
             clearSlot(activeSlot);
-            selectPokemon(pokemon.id);
-    		addPokemon(activeSlot, pokemon.id);
+            selectPokemon(pokemon.index);
+    		addPokemon(activeSlot, pokemon.index);
     	}
     }
 
