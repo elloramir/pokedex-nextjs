@@ -10,7 +10,7 @@ import { SlotItem } from "@/components/SlotItem";
 import { useTeamContext } from "@/contexts/Team";
 import colors from "@/data/colors.json";
 
-export function Slots({ isPreview = false }) {
+export function TeamView({ isPreview = false, name, pokemons }) {
 	const { slots, setSlots, titleName } = useTeamContext();
 	const [ isEditable, setIsEditable ] = useState(false);
   	const selfRef = useRef(null);
@@ -74,11 +74,11 @@ export function Slots({ isPreview = false }) {
 				onKeyDown={handleKeyDown}
 				suppressContentEditableWarning
 			>
-				{titleName.current}
+				{ isPreview ? name : titleName.current}
 			</h2>
 
 			{
-				!isEditable && <button 
+				(!isEditable && !isPreview) && <button 
 					className={styles.editButton} 
 					onClick={handleEnterEdit} 
 					aria-label="Editar título"
@@ -89,13 +89,13 @@ export function Slots({ isPreview = false }) {
 
 			<div className={styles.slotContainer}>
 				<div className={styles.slotGroup}>
-					{ slots.slice(0, 3).map((slot, index) => (
-						<SlotItem key={index} index={index} />
+					{ [0, 1, 2].map((index) => (
+						<SlotItem key={index} index={index} fixedPokemon={pokemons?.[index]} />
 					))}
 				</div>
 				<div className={styles.slotGroup}>
-				 	{ slots.slice(0, 3).map((slot, index) => (
-						<SlotItem key={index+3} index={index+3} />
+				 	{ [3, 4, 5].map((index) => (
+						<SlotItem key={index} index={index} fixedPokemon={pokemons?.[index]} />
 					))}
 				</div>
 			</div>

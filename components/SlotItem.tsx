@@ -12,10 +12,10 @@ import { useTeamContext } from "@/contexts/Team";
 import { usePokemonsContext } from "@/contexts/Pokemons";
 
 
-export function SlotItem({ index }) {
+export function SlotItem({ index, fixedPokemon }) {
 	const { slots, setActiveSlot, activeSlot, addPokemon, clearSlot } = useTeamContext();
 	const { selectPokemon, unselectPokemon, loadedPokemons } = usePokemonsContext();
-	const pokemon = loadedPokemons[slots[index]];
+	const pokemon = loadedPokemons[fixedPokemon || slots[index]];
 	const svgRef = useRef(null);
 
 	// Handle pokemons dropped over us
@@ -63,7 +63,10 @@ export function SlotItem({ index }) {
 		const path = svg.querySelector("path");
 		const color = pokemon ? colors[pokemon.types[0]] : "#fff";
 
-		path.setAttribute("fill", color);
+		// In case of SVG did't get loaded yeat
+		if (path) {			
+			path.setAttribute("fill", color);
+		}
 	}, [slots]);
 
 	return (

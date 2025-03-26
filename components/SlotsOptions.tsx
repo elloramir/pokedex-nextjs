@@ -8,12 +8,13 @@ import styles from "@/styles/SlotsOptions.module.css";
 
 import React from "react";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 import { useTeamContext } from "@/contexts/Team";
 import { usePokemonsContext } from "@/contexts/Pokemons";
 
 export function SlotsOptions() {
-	const { slots, activeSlot, clearSlot } = useTeamContext();
-	const { unselectPokemon } = usePokemonsContext();
+	const { slots, titleName, activeSlot, clearSlot } = useTeamContext();
+	const { unselectPokemon, loadedPokemons } = usePokemonsContext();
 	const pokemonId = slots[activeSlot];
 	
 
@@ -24,6 +25,24 @@ export function SlotsOptions() {
 	function handleRemoveActiveSlot() {
 		unselectPokemon(pokemonId);
 		clearSlot(activeSlot);
+	}
+
+	function handleSaveTeam() {
+		fetch("api", {
+			method: "post",
+			body: JSON.stringify({
+				name: titleName.current,
+				pokemons: slots.map(index => loadedPokemons[index].id),
+			})
+		})
+		.then((resp) => {
+			if (resp.status === 201) {
+				redirect("/teams");				
+			}
+			else {
+				alert("Can't save that pokemon team");
+			}
+		});
 	}
 
 	return (
@@ -44,8 +63,7 @@ export function SlotsOptions() {
 			<button 
 				className={`${styles.buttonImage} ${styles.success} ${!isComplete() ? styles.disabled : ""}`}
 				aria-label="Select Team"
-				disabled={ isComplete() }
-				// onClick={() => saveTeam()}
+				onClick={handleSaveTeam}
 			>
 				<Image 
 					src="/images/select.png" 
