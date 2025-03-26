@@ -1,31 +1,60 @@
-import React from 'react';
+// Copyright 2025 Elloramir.
+// All rights over the code are reserved.
+
+"use client";
+
+import styles from "@/styles/Pokemons.module.css";
+
+import React, { useRef, useEffect } from 'react';
 import Image from 'next/image';
-import styles from '../styles/PokemonGrid.module.css';
-import colors from "../data/colors.json";
-import { usePokemonsContext } from '../contexts/Pokemons';
+import colors from "@/data/colors.json";
+import { usePokemonsContext } from "@/contexts/Pokemons";
+import { useTeamContext } from "@/contexts/Team";
 
-export const PokemonGrid: React.FC = () => {
-    const { availablePokemons } = usePokemonsContext();
 
-    const handleDragStart = (e: React.DragEvent<HTMLDivElement>, pokemon: any) => {
+export function Pokemons() {
+    const { loadedPokemons, selectPokemon } = usePokemonsContext();
+	const { activeSlot, addPokemon, slots, clearSlot } = useTeamContext();
+
+
+    // In order to fit on the layout, we should
+    // limit the total amount of char a pokemon can display.
+    function clampName(name, length = 7) {
+    	if (name.length > length) {
+    		return name.slice(0, length) + '...';
+    	}
+    	return name;
+    }
+
+
+    // Whne we start move the pokemon to somewhere (team slot maybe)
+    function handleDragStart(e, pokemon) {
+    	// Ignoraa already selected pokemons
         if (pokemon.selected) {
             e.preventDefault();
             return;
         }
 
-        e.dataTransfer?.setData('text/plain', JSON.stringify(pokemon));
+        // Set draggable data to our pokemon
+        e.dataTransfer?.setData('text/plain', String(pokemon.id));
     };
 
-    const clampName = (name: string, length = 7) => {
-        return name.length > length ? name.slice(0, length) + '...' : name;
-    };
 
-    return (
+    // We can also select pokemons to current slot by clicking on it!
+    function handleClick(pokemon) {
+    	if (activeSlot) {
+            clearSlot(activeSlot);
+            selectPokemon(pokemon.id);
+    		addPokemon(activeSlot, pokemon.id);
+    	}
+    }
+
+	return (
         <div className={styles.choose}>
             <h2 className={styles.title}>Choose 6 Pokemons:</h2>
             <div className={styles.scrollContainer}>
                 <div className={styles.pokemonGrid}>
-                    {availablePokemons.map((pokemon) => (
+                    { loadedPokemons.map((pokemon) => (
                         <div 
                             key={pokemon.id} 
                             className={styles.pokemonCard}
@@ -35,7 +64,8 @@ export const PokemonGrid: React.FC = () => {
                                 <Image 
                                     draggable
                                     onDragStart={(e) => handleDragStart(e, pokemon)}
-                                    src={pokemon.imageUrl} 
+                                    onClick={() => handleClick(pokemon)}
+                                    src={pokemon.image} 
                                     alt={pokemon.name} 
                                     fill 
                                     style={{ objectFit: 'contain' }}
@@ -56,7 +86,7 @@ export const PokemonGrid: React.FC = () => {
                             </div>
                             <div className={styles.pokemonName}>{clampName(pokemon.name)}</div>
                             <div className={styles.pokemonTypes}>
-                                {pokemon.types.map((type) => (
+                                { pokemon.types.map((type) => (
                                     <span 
                                         key={type} 
                                         className={styles.typeIndicator}
@@ -70,4 +100,4 @@ export const PokemonGrid: React.FC = () => {
             </div>
         </div>
     );
-};
+}

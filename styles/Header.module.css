@@ -13,3 +13,8 @@
     margin-top: 30px;
     font-size: 1em;
 }
+
+.link {
+    text-decoration: none;
+    color: #fff;
+}
