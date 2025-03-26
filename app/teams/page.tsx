@@ -6,10 +6,13 @@
 import React, { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { TeamView } from "@/components/TeamView"; 
+import { usePokemonsContext } from "@/contexts/Pokemons";
 
 
 export default function PageTeams() {
     const [teams, setTeams] = useState([]);
+    const { ensureThatPokemon } = usePokemonsContext();
+
 
     useEffect(() => {
         fetch("/api")
@@ -17,7 +20,8 @@ export default function PageTeams() {
             .then(teams => {
                 setTeams(teams.map(team => Object({
                     name: team.name,
-                    pokemons: team.slots.map(slot => slot.pokemonId)
+                    pokemons: team.slots.map(slot =>
+                        {ensureThatPokemon(slot.pokemonId); return slot.pokemonId})
                 })));
             });
     }, []);

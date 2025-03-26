@@ -39,6 +39,36 @@ export function PokemonsProvider({ children }) {
 			});
 	}
 
+	function ensureThatPokemon(pokemonId) {
+        if (loadedPokemons.some(pokemon => pokemon?.id === pokemonId)) return;
+
+        const newPokemons = [...loadedPokemons];
+        const index = pokemonId - 1;
+
+        while (newPokemons.length <= index) {
+            newPokemons.push(null);
+        }
+
+        fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`)
+            .then(resp => resp.json())
+            .then(data => {
+                newPokemons[index] = {
+                    id: data.id,
+                    name: data.name,
+                    number: data.id,
+                    image: data.sprites.front_default,
+                    types: data.types.map((typeInfo) => typeInfo.type.name),
+                    selected: false,
+                    index,
+                };
+                setLoadedPokemons([...newPokemons]);
+            })
+            .catch(() => {
+                newPokemons[index] = undefined;
+                setLoadedPokemons([...newPokemons]);
+            });
+    }
+
 	function selectPokemon(index) {
 		setLoadedPokemons(loadedPokemons.map(pokemon => {
 			if (pokemon.index == index) {
@@ -67,6 +97,7 @@ export function PokemonsProvider({ children }) {
 			queryPokemons,
 			selectPokemon,
 			unselectPokemon,
+			ensureThatPokemon,
 		}}>
 			{children}
 		</Context.Provider>

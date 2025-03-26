@@ -16,11 +16,7 @@ export function SlotsOptions() {
 	const { slots, titleName, activeSlot, clearSlot } = useTeamContext();
 	const { unselectPokemon, loadedPokemons } = usePokemonsContext();
 	const pokemonId = slots[activeSlot];
-	
-
-	function isComplete() {
-		return slots.every(slot => slot !== null);
-	}
+	const isComplete = slots.every(slot => slot !== null);
 
 	function handleRemoveActiveSlot() {
 		unselectPokemon(pokemonId);
@@ -61,9 +57,10 @@ export function SlotsOptions() {
 				/>
 			</button>
 			<button 
-				className={`${styles.buttonImage} ${styles.success} ${!isComplete() ? styles.disabled : ""}`}
+				className={`${styles.buttonImage} ${styles.success} ${!isComplete ? styles.disabled : ""}`}
 				aria-label="Select Team"
 				onClick={handleSaveTeam}
+				disabled={!isComplete}
 			>
 				<Image 
 					src="/images/select.png" 

@@ -67,11 +67,11 @@ export function SlotItem({ index, fixedPokemon }) {
 		if (path) {			
 			path.setAttribute("fill", color);
 		}
-	}, [slots]);
+	}, [slots, pokemon]);
 
 	return (
 		<div 
-			className={`${styles.slot} ${index === activeSlot ? styles.selectedSlot : ""}`}
+			className={`${styles.slot} ${(index === activeSlot && !fixedPokemon) ? styles.selectedSlot : ""}`}
 			onDragOver={handleDragOver}
 			onDrop={handleDrop}
 			onClick={() => { setActiveSlot(index); }}
