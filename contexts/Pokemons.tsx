@@ -41,6 +41,7 @@ export function PokemonsProvider({ children }) {
 			});
 	}
 
+	// @TODO(ellora): More efficient way to ensure
 	async function ensureThatPokemons(pokemonsId) {
 		const biggest = pokemonsId.sort((a, b) => b - a).shift();
 		await queryPokemons(0, biggest);
