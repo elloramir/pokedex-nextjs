@@ -1,13 +1,20 @@
 // Copyright 2025 Elloramir.
 // All rights over the code are reserved.
 
+import path from "path";
 import { PrismaClient } from '@prisma/client'
 import { NextResponse } from 'next/server'
 
 
 // We only have that endpoint, so the client instance could
 // be here for sure! Show me the book...
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+	datasources: {
+		db: {
+			url: 'file:' + path.join(process.cwd(), 'prisma/dev.db'),
+		},
+	},
+});
 
 
 export async function POST(request: Request) {
