@@ -14,7 +14,7 @@ export function Pokemons() {
     const { loadedPokemons, selectPokemon, queryPokemons } = usePokemonsContext();
     const { activeSlot, addPokemon, slots, clearSlot } = useTeamContext();
     const scrollRef = useRef(null);
-    const [loading, setLoading] = useState(false); // Add loading state
+    const [loading, setLoading] = useState(false);
 
     // Function that checks if the scroll has reached the bottom
     const handleScroll = () => {

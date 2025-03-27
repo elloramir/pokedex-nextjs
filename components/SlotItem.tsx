@@ -15,7 +15,7 @@ import { usePokemonsContext } from "@/contexts/Pokemons";
 export function SlotItem({ index, fixedPokemon }) {
 	const { slots, setActiveSlot, activeSlot, addPokemon, clearSlot } = useTeamContext();
 	const { selectPokemon, unselectPokemon, loadedPokemons } = usePokemonsContext();
-	const pokemon = loadedPokemons[fixedPokemon || slots[index]];
+	const pokemon = loadedPokemons?.find(e => e.id === (fixedPokemon || slots[index]));
 	const svgRef = useRef(null);
 
 	// Handle pokemons dropped over us

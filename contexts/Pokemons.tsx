@@ -14,7 +14,6 @@ export function PokemonsProvider({ children }) {
 	
 	// Query bucked pokemons
 	function queryPokemons(from = 0, to = 32) {
-		console.log(from, to)
 		return fetch(`https://pokeapi.co/api/v2/pokemon?limit=${to}&offset=${from}`)
 			.then(resp => resp.json())
 			.then(async (data) => {
