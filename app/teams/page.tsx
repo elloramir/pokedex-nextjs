@@ -11,18 +11,24 @@ import { usePokemonsContext } from "@/contexts/Pokemons";
 
 export default function PageTeams() {
     const [teams, setTeams] = useState([]);
-    const { ensureThatPokemon } = usePokemonsContext();
+    const { ensureThatPokemons } = usePokemonsContext();
 
 
     useEffect(() => {
         fetch("/api")
             .then(resp => resp.json())
-            .then(teams => {
-                setTeams(teams.map(team => Object({
+            .then(async (teams) => {
+                const toLoadPokemons = new Set();
+                const newTeams = teams.map(team => Object({
                     name: team.name,
-                    pokemons: team.slots.map(slot =>
-                        {ensureThatPokemon(slot.pokemonId); return slot.pokemonId})
-                })));
+                    pokemons: team.slots.map((slot) => {
+                        toLoadPokemons.add(slot.pokemonId);
+                        return slot.pokemonId;
+                    })
+                }))
+
+                await ensureThatPokemons(Array.from(toLoadPokemons));
+                setTeams(newTeams);
             });
     }, []);
 

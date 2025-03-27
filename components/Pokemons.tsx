@@ -4,55 +4,76 @@
 "use client";
 
 import styles from "@/styles/Pokemons.module.css";
-
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
 import colors from "@/data/colors.json";
 import { usePokemonsContext } from "@/contexts/Pokemons";
 import { useTeamContext } from "@/contexts/Team";
 
-
 export function Pokemons() {
-    const { loadedPokemons, selectPokemon } = usePokemonsContext();
-	const { activeSlot, addPokemon, slots, clearSlot } = useTeamContext();
+    const { loadedPokemons, selectPokemon, queryPokemons } = usePokemonsContext();
+    const { activeSlot, addPokemon, slots, clearSlot } = useTeamContext();
+    const scrollRef = useRef(null);
+    const [loading, setLoading] = useState(false); // Add loading state
 
+    // Function that checks if the scroll has reached the bottom
+    const handleScroll = () => {
+        if (scrollRef.current) {
+            const { scrollTop, clientHeight, scrollHeight } = scrollRef.current;
+            // If it's 50px from the bottom, load more pokemons
+            if (scrollTop + clientHeight >= scrollHeight - 50 && !loading) {
+                setLoading(true); // Set loading to true when starting to load more
+                // Load 32 more pokemons from the already loaded ones
+                queryPokemons(loadedPokemons.length, 32).finally(() => {
+                    setLoading(false); // Set loading to false once loading is complete
+                });
+            }
+        }
+    };
 
-    // In order to fit on the layout, we should
-    // limit the total amount of char a pokemon can display.
+    useEffect(() => {
+        const scrollContainer = scrollRef.current;
+        if (scrollContainer) {
+            scrollContainer.addEventListener('scroll', handleScroll);
+        }
+        // Remove event listener when the component unmounts
+        return () => {
+            if (scrollContainer) {
+                scrollContainer.removeEventListener('scroll', handleScroll);
+            }
+        };
+    }, [loadedPokemons, loading]);
+
+    // To limit the length of the pokemon's name
     function clampName(name, length = 7) {
-    	if (name.length > length) {
-    		return name.slice(0, length) + '...';
-    	}
-    	return name;
+        if (name.length > length) {
+            return name.slice(0, length) + '...';
+        }
+        return name;
     }
 
-
-    // Whne we start move the pokemon to somewhere (team slot maybe)
+    // When starting to drag
     function handleDragStart(e, pokemon) {
-    	// Ignoraa already selected pokemons
         if (pokemon.selected) {
             e.preventDefault();
             return;
         }
-
-        // Set draggable data to our pokemon
         e.dataTransfer?.setData('text/plain', String(pokemon.index));
     };
 
-
-    // We can also select pokemons to current slot by clicking on it!
+    // When clicking to select
     function handleClick(pokemon) {
-    	if (activeSlot) {
+        if (activeSlot) {
             clearSlot(activeSlot);
             selectPokemon(pokemon.index);
-    		addPokemon(activeSlot, pokemon.index);
-    	}
+            addPokemon(activeSlot, pokemon.index);
+        }
     }
 
-	return (
+    return (
         <div className={styles.choose}>
             <h2 className={styles.title}>Choose 6 Pokemons:</h2>
-            <div className={styles.scrollContainer}>
+            <div ref={scrollRef} className={styles.scrollContainer}>
                 <div className={styles.pokemonGrid}>
                     { loadedPokemons.map((pokemon) => (
                         <div 
@@ -70,7 +91,6 @@ export function Pokemons() {
                                     fill 
                                     style={{ objectFit: 'contain' }}
                                 />
-
                                 {
                                     pokemon.selected &&
                                         <div className={styles.pokemonSelected}>
@@ -82,7 +102,6 @@ export function Pokemons() {
                                             />
                                         </div>
                                 }
-                                
                             </div>
                             <div className={styles.pokemonName}>{clampName(pokemon.name)}</div>
                             <div className={styles.pokemonTypes}>
@@ -95,8 +114,19 @@ export function Pokemons() {
                                 ))}
                             </div>
                         </div>
-                    ))}
+                    )) }
                 </div>
+                {/* Show spinner if loading */}
+                {loading && (
+                    <div className={styles.spinnerContainer}>
+                        <Image 
+                            src="/images/spinner.gif" 
+                            alt="Loading..." 
+                            width={50} 
+                            height={50} 
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );

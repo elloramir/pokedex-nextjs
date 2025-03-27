@@ -12,62 +12,62 @@ const Context = createContext(undefined);
 export function PokemonsProvider({ children }) {
 	const [loadedPokemons, setLoadedPokemons] = useState([]);
 	
+	// Query bucked pokemons
 	function queryPokemons(from = 0, to = 32) {
-		return fetch(`https://pokeapi.co/api/v2/pokemon?limit=${to}`)
+		return fetch(`https://pokeapi.co/api/v2/pokemon?limit=${to}&offset=${from}`)
 			.then(resp => resp.json())
 			.then(async (data) => {
-				const pokemons = new Array();
+				const pokemonDetailsPromises = data.results.map(pokemon => 
+					fetch(pokemon.url)
+						.then(resp => resp.json())
+						.then(props => ({
+							id: props.id,
+							name: props.name,
+							number: props.id,
+							image: props.sprites.front_default,
+							types: props.types.map(typeInfo => typeInfo.type.name),
+							selected: false
+						}))
+				);
 
-				for (const pokemon of data.results) {
-					const details = await fetch(pokemon.url);
-					const props = await details.json();
+				// Making all request in parallel
+				const pokemons = await Promise.all(pokemonDetailsPromises);
 
-					pokemons.push({
-						id: props.id,
-						name: props.name,
-						number: props.id,
-						image: props.sprites.front_default,
-						types: props.types.map((typeInfo: any) => typeInfo.type.name),
-						selected: false
-					});
-				}
-
+				// Update loaded pokemons
 				const fused = [...loadedPokemons, ...pokemons];
-				const indexed = fused.map((pokemon, index) => Object({...pokemon, index}));
+				const indexed = fused.map((pokemon, index) => Object({ ...pokemon, index }));
 
 				setLoadedPokemons(indexed);
 			});
 	}
 
-	function ensureThatPokemon(pokemonId) {
-        if (loadedPokemons.some(pokemon => pokemon?.id === pokemonId)) return;
+	async function ensureThatPokemons(pokemonsId) {
+		const sorted = pokemonsId.sort((a, b) => a-b);
+		const promiseChain = sorted.map(pokemonId =>
+			fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`)
+	            .then(resp => resp.json())
+	            .then(data => {
+	                const pokemon = {
+	                    id: data.id,
+	                    name: data.name,
+	                    number: data.id,
+	                    image: data.sprites.front_default,
+	                    types: data.types.map((typeInfo) => typeInfo.type.name),
+	                    selected: false,
+	                };
 
-        const newPokemons = [...loadedPokemons];
-        const index = pokemonId - 1;
+	                return pokemon;
+	            }));
 
-        while (newPokemons.length <= index) {
-            newPokemons.push(null);
-        }
+		const pokemons = await Promise.all(promiseChain);
+		const fused = [...loadedPokemons];
+		
+		for (const pokemon of pokemons) {
+			fused[pokemon.id] = pokemon;
+		}
 
-        fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`)
-            .then(resp => resp.json())
-            .then(data => {
-                newPokemons[index] = {
-                    id: data.id,
-                    name: data.name,
-                    number: data.id,
-                    image: data.sprites.front_default,
-                    types: data.types.map((typeInfo) => typeInfo.type.name),
-                    selected: false,
-                    index,
-                };
-                setLoadedPokemons([...newPokemons]);
-            })
-            .catch(() => {
-                newPokemons[index] = undefined;
-                setLoadedPokemons([...newPokemons]);
-            });
-    }
+		setLoadedPokemons(fused);
+	}
 
 	function selectPokemon(index) {
 		setLoadedPokemons(loadedPokemons.map(pokemon => {
@@ -87,17 +87,13 @@ export function PokemonsProvider({ children }) {
 		}));
 	}
 
-	// Query 32 initial pokemons and save it.
-	// We can load more pokemons by scrolling the list until the end.
-	useEffect(() => { queryPokemons() }, []);
-
 	return (
 		<Context.Provider value={{
 			loadedPokemons,
 			queryPokemons,
 			selectPokemon,
 			unselectPokemon,
-			ensureThatPokemon,
+			ensureThatPokemons,
 		}}>
 			{children}
 		</Context.Provider>

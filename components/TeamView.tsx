@@ -10,7 +10,7 @@ import { SlotItem } from "@/components/SlotItem";
 import { useTeamContext } from "@/contexts/Team";
 import colors from "@/data/colors.json";
 
-export function TeamView({ isPreview = false, name, pokemons }) {
+export function TeamView({ isPreview = false, name = null, pokemons = null }) {
 	const { slots, setSlots, titleName } = useTeamContext();
 	const [ isEditable, setIsEditable ] = useState(false);
   	const selfRef = useRef(null);

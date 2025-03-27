@@ -41,6 +41,11 @@ export function SlotItem({ index, fixedPokemon }) {
 	}
 
 	function handleDragStart(e) {
+		if (fixedPokemon) {
+			e.preventDefault();
+			return;
+		}
+
 		e.dataTransfer.setData("text/plain", String(pokemon.index));
 	};
 
@@ -55,6 +60,12 @@ export function SlotItem({ index, fixedPokemon }) {
 		if (e.dataTransfer.dropEffect === "none") {
         	unselectPokemon(pokemon.index);
    		}
+	}
+
+	function handleSlotClick() {
+		if (!fixedPokemon) {
+			setActiveSlot(index);			
+		}
 	}
 
 	// Change svg color dynamicaly every time slots change
@@ -74,7 +85,7 @@ export function SlotItem({ index, fixedPokemon }) {
 			className={`${styles.slot} ${(index === activeSlot && !fixedPokemon) ? styles.selectedSlot : ""}`}
 			onDragOver={handleDragOver}
 			onDrop={handleDrop}
-			onClick={() => { setActiveSlot(index); }}
+			onClick={handleSlotClick}
 		>
 			{pokemon && (
 				<Image 

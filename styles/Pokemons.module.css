@@ -89,3 +89,12 @@
     object-fit: contain;
     pointer-events: none;
 }
+
+.spinnerContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+}
