@@ -8,6 +8,7 @@ import styles from "@/styles/Slots.module.css";
 import React, { useRef, useEffect } from "react";
 import Image from "next/image";
 import colors from "@/data/colors.json";
+import { ImageLoader } from "@/components/ImageLoader";
 import { useTeamContext } from "@/contexts/Team";
 import { usePokemonsContext } from "@/contexts/Pokemons";
 
@@ -18,6 +19,8 @@ export function SlotItem({ index, fixedPokemon }) {
 	const pokemon = loadedPokemons?.find(e => e.id === (fixedPokemon || slots[index]));
 	const svgRef = useRef(null);
 	const isSameSlot = useRef(false);
+
+	const ImageComponent = !fixedPokemon ? Image : ImageLoader;
 
 	// Handle pokemons dropped over us
 	function handleDrop(e) {
@@ -68,7 +71,7 @@ export function SlotItem({ index, fixedPokemon }) {
 		// out the slots boundaries (like a swip discard).
 		if (e.dataTransfer.dropEffect === "none") {
 			unselectPokemon(pokemon.id);
-   		}
+		}
 	}
 
 	function handleSlotClick() {
@@ -79,26 +82,41 @@ export function SlotItem({ index, fixedPokemon }) {
 
 	// Change svg color dynamicaly every time slots change
 	useEffect(() => {
-		const svg = svgRef.current.contentDocument;
-		const path = svg.querySelector("path");
-		const color = pokemon ? colors[pokemon.types[0]] : "#fff";
+		const updateSVGColor = () => {
+			const svg = svgRef.current?.contentDocument;
+			const path = svg?.querySelector("path");
+			const color = pokemon ? colors[pokemon.types[0]] : "#fff";
 
-		// In case of SVG did't get loaded yeat
-		if (path) {			
-			path.setAttribute("fill", color);
+			if (path) {
+				path.setAttribute("fill", color);
+			}
+		};
+
+		// Allways try even if not loaded
+		updateSVGColor();
+
+		const svgElement = svgRef.current;
+		if (svgElement) {
+			svgElement.addEventListener("load", updateSVGColor);
 		}
-	}, [slots, pokemon]);
+
+		return () => {
+			svgElement?.removeEventListener("load", updateSVGColor);
+		};
+	}, [slots]);
+
+
 
 	return (
 		<div 
 			className={`${styles.slot} ${activeSlot !== null && activeSlot !== index ? styles.graySelection : ""} ${(index === activeSlot && !fixedPokemon) ? styles.selectedSlot : ""}`}
-			style={{ border: (activeSlot === index && pokemon) ? `5px dashed ${colors[pokemon.types[0]]}` : "" }}
+			style={{ border: (!fixedPokemon && activeSlot === index && pokemon) ? `5px dashed ${colors[pokemon.types[0]]}` : "" }}
 			onDragOver={handleDragOver}
 			onDrop={handleDrop}
 			onClick={handleSlotClick}
 		>
 			{pokemon && (
-				<Image
+				<ImageComponent
 					draggable
 					src={pokemon.image} 
 					onDragStart={handleDragStart}
@@ -108,8 +126,9 @@ export function SlotItem({ index, fixedPokemon }) {
 					style={{ objectFit: "contain" }}
 				/>
 			)}
+			{/* @NOTE(ellora): Objects are significantly slower than images and pure svg elements */}
 			<object 
-				data="/images/slot.svg" 
+				data="/images/slot.svg"
 				type="image/svg+xml" 
 				className={styles.slotObject}
 				ref={svgRef}

@@ -7,6 +7,7 @@ import styles from "@/styles/Pokemons.module.css";
 import React, { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
 import colors from "@/data/colors.json";
+import { ImageLoader } from "@/components/ImageLoader";
 import { usePokemonsContext } from "@/contexts/Pokemons";
 import { useTeamContext } from "@/contexts/Team";
 
@@ -83,7 +84,7 @@ export function Pokemons() {
                         >
                             <div className={styles.pokemonNumber}>#{pokemon.number}</div>
                             <div className={styles.pokemonPreview}>
-                                <Image 
+                                <ImageLoader 
                                     draggable
                                     onDragStart={(e) => handleDragStart(e, pokemon)}
                                     onClick={() => handleClick(pokemon)}
