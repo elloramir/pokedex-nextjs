@@ -23,7 +23,7 @@ export default function PageTeams() {
                     name: team.name,
                     pokemons: team.slots.map((slot) => {
                         toLoadPokemons.add(slot.pokemonId);
-                        return slot.pokemonId;
+                        return slot.pokemonId - 1;
                     })
                 }))
 

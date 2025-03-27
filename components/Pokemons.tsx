@@ -75,9 +75,9 @@ export function Pokemons() {
             <h2 className={styles.title}>Choose 6 Pokemons:</h2>
             <div ref={scrollRef} className={styles.scrollContainer}>
                 <div className={styles.pokemonGrid}>
-                    { loadedPokemons.map((pokemon) => (
+                    { loadedPokemons.map((pokemon, index) => pokemon && (
                         <div 
-                            key={pokemon.id} 
+                            key={index} 
                             className={styles.pokemonCard}
                         >
                             <div className={styles.pokemonNumber}>#{pokemon.number}</div>

@@ -14,6 +14,7 @@ export function PokemonsProvider({ children }) {
 	
 	// Query bucked pokemons
 	function queryPokemons(from = 0, to = 32) {
+		console.log(from, to)
 		return fetch(`https://pokeapi.co/api/v2/pokemon?limit=${to}&offset=${from}`)
 			.then(resp => resp.json())
 			.then(async (data) => {
@@ -42,31 +43,8 @@ export function PokemonsProvider({ children }) {
 	}
 
 	async function ensureThatPokemons(pokemonsId) {
-		const sorted = pokemonsId.sort((a, b) => a-b);
-		const promiseChain = sorted.map(pokemonId =>
-			fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`)
-	            .then(resp => resp.json())
-	            .then(data => {
-	                const pokemon = {
-	                    id: data.id,
-	                    name: data.name,
-	                    number: data.id,
-	                    image: data.sprites.front_default,
-	                    types: data.types.map((typeInfo) => typeInfo.type.name),
-	                    selected: false,
-	                };
-
-	                return pokemon;
-	            }));
-
-		const pokemons = await Promise.all(promiseChain);
-		const fused = [...loadedPokemons];
-		
-		for (const pokemon of pokemons) {
-			fused[pokemon.id] = pokemon;
-		}
-
-		setLoadedPokemons(fused);
+		const biggest = pokemonsId.sort((a, b) => b - a).shift();
+		await queryPokemons(0, biggest);
 	}
 
 	function selectPokemon(index) {

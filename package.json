@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "start-db": "prisma init --datasource-provider sqlite",
+    "migrate": "prisma migrate dev --name init"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
