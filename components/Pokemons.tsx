@@ -11,7 +11,7 @@ import { usePokemonsContext } from "@/contexts/Pokemons";
 import { useTeamContext } from "@/contexts/Team";
 
 export function Pokemons() {
-    const { loadedPokemons, selectPokemon, queryPokemons } = usePokemonsContext();
+    const { loadedPokemons, selectPokemon, unselectPokemon, queryPokemons } = usePokemonsContext();
     const { activeSlot, addPokemon, slots, clearSlot } = useTeamContext();
     const scrollRef = useRef(null);
     const [loading, setLoading] = useState(false);
@@ -58,15 +58,16 @@ export function Pokemons() {
             e.preventDefault();
             return;
         }
-        e.dataTransfer?.setData('text/plain', String(pokemon.index));
+        e.dataTransfer?.setData('text/plain', String(pokemon.id));
     };
 
     // When clicking to select
     function handleClick(pokemon) {
-        if (activeSlot) {
+        if (activeSlot !== null) {
+            unselectPokemon(slots[activeSlot]);
             clearSlot(activeSlot);
-            selectPokemon(pokemon.index);
-            addPokemon(activeSlot, pokemon.index);
+            selectPokemon(pokemon.id);
+            addPokemon(activeSlot, pokemon.id);
         }
     }
 

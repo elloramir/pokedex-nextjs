@@ -32,12 +32,10 @@ export function PokemonsProvider({ children }) {
 
 				// Making all request in parallel
 				const pokemons = await Promise.all(pokemonDetailsPromises);
-
 				// Update loaded pokemons
 				const fused = [...loadedPokemons, ...pokemons];
-				const indexed = fused.map((pokemon, index) => Object({ ...pokemon, index }));
 
-				setLoadedPokemons(indexed);
+				setLoadedPokemons(fused);
 			});
 	}
 
@@ -47,18 +45,18 @@ export function PokemonsProvider({ children }) {
 		await queryPokemons(0, biggest);
 	}
 
-	function selectPokemon(index) {
+	function selectPokemon(id) {
 		setLoadedPokemons(loadedPokemons.map(pokemon => {
-			if (pokemon.index == index) {
+			if (pokemon.id == id) {
 				pokemon.selected = true;
 			}
 			return pokemon;
 		}));
 	}
 
-	function unselectPokemon(index) {
+	function unselectPokemon(id) {
 		setLoadedPokemons(loadedPokemons.map(pokemon => {
-			if (pokemon.index == index) {
+			if (pokemon.id == id) {
 				pokemon.selected = false;
 			}
 			return pokemon;

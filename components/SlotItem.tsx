@@ -17,23 +17,29 @@ export function SlotItem({ index, fixedPokemon }) {
 	const { selectPokemon, unselectPokemon, loadedPokemons } = usePokemonsContext();
 	const pokemon = loadedPokemons?.find(e => e.id === (fixedPokemon || slots[index]));
 	const svgRef = useRef(null);
+	const isSameSlot = useRef(false);
 
 	// Handle pokemons dropped over us
 	function handleDrop(e) {
 		e.preventDefault();
 
 		const pokemonData = e.dataTransfer.getData("text/plain");
-		const pokemonIndex = Number(pokemonData);
+		const pokemonId = Number(pokemonData);
+
+		// Ignore same slots drop
+		if (slots.findIndex(p => p === pokemon?.id) === index) {
+			isSameSlot.current = true;
+		}
 
 		// If we already have a pokemon on that slot
 		// we should remove it first!
 		if (pokemon) {
 			clearSlot(index);
-			unselectPokemon(pokemon.index);
+			unselectPokemon(pokemon.id);
 		}
 
-		selectPokemon(pokemonIndex);
-		addPokemon(index, pokemonIndex);
+		selectPokemon(pokemonId);
+		addPokemon(index, pokemonId);
 	};
 
 	function handleDragOver(e) {
@@ -46,19 +52,22 @@ export function SlotItem({ index, fixedPokemon }) {
 			return;
 		}
 
-		e.dataTransfer.setData("text/plain", String(pokemon.index));
+		isSameSlot.current = false;
+		e.dataTransfer.setData("text/plain", String(pokemon.id));
 	};
 
 	// Allways clear it when moved-out
 	function handleDragEnd(e) {
-		clearSlot(index);
+		if (!isSameSlot.current) {
+			clearSlot(index);			
+		}
 
 		// Check if we dopped the pokemon away.
 		// In that particular case we need to unset it since
 		// no other slot will do it for us, since we are throwing it
 		// out the slots boundaries (like a swip discard).
 		if (e.dataTransfer.dropEffect === "none") {
-        	unselectPokemon(pokemon.index);
+			unselectPokemon(pokemon.id);
    		}
 	}
 
@@ -88,7 +97,7 @@ export function SlotItem({ index, fixedPokemon }) {
 			onClick={handleSlotClick}
 		>
 			{pokemon && (
-				<Image 
+				<Image
 					draggable
 					src={pokemon.image} 
 					onDragStart={handleDragStart}
