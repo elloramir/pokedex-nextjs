@@ -1,37 +1,13 @@
 // Copyright 2025 Elloramir.
 // All rights over the code are reserved.
 
-import path from "path";
 import { PrismaClient } from '@prisma/client'
 import { NextResponse } from 'next/server'
 
 
 // We only have that endpoint, so the client instance could
 // be here for sure! Show me the book...
-declare global {
-	// eslint-disable-next-line no-var
-	var cachedPrisma: PrismaClient;
-}
-
-// Workaround to find the db file in production
-const filePath = path.join(process.cwd(), 'prisma/dev.db');
-const config = {
-	datasources: {
-		db: {
-			url: 'file:' + filePath,
-		},
-	},
-};
-
-let prisma: PrismaClient;
-if (process.env.NODE_ENV === 'production') {
-	prisma = new PrismaClient(config);
-} else {
-	if (!global.cachedPrisma) {
-		global.cachedPrisma = new PrismaClient(config);
-	}
-	prisma = global.cachedPrisma;
-}
+const prisma = new PrismaClient();
 
 
 export async function POST(request: Request) {
