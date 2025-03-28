@@ -33,7 +33,7 @@ export function SlotsOptions() {
 			method: "post",
 			body: JSON.stringify({
 				name: titleName.current,
-				pokemons: slots.map(index => loadedPokemons[index].id),
+				pokemons: slots,
 			})
 		})
 		.then((resp) => {

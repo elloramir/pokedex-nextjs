@@ -41,8 +41,23 @@ export function PokemonsProvider({ children }) {
 
 	// @TODO(ellora): More efficient way to ensure
 	async function ensureThatPokemons(pokemonsId) {
-		const biggest = pokemonsId.sort((a, b) => b - a).shift();
-		await queryPokemons(0, biggest);
+		// Query pokemons individually using Promise.all for parallel fetching
+		const pokemonPromises = pokemonsId.map((id) =>
+			fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+				.then((resp) => resp.json())
+				.then((props) => ({
+					id: props.id,
+					name: props.name,
+					number: props.id,
+					image: props.sprites.front_default + "?v=1", // Activate cache
+					types: props.types.map((typeInfo) => typeInfo.type.name),
+					selected: false,
+				}))
+		);
+
+		const pokemons = await Promise.all(pokemonPromises);
+		// Update loaded pokemons
+		setLoadedPokemons((prevPokemons) => [...prevPokemons, ...pokemons]);
 	}
 
 	function selectPokemon(id) {
