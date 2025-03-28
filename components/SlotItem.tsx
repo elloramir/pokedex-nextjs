@@ -109,7 +109,7 @@ export function SlotItem({ index, fixedPokemon }) {
 
 	return (
 		<div 
-			className={`${styles.slot} ${activeSlot !== null && activeSlot !== index ? styles.graySelection : ""} ${(index === activeSlot && !fixedPokemon) ? styles.selectedSlot : ""}`}
+			className={`${styles.slot} ${!fixedPokemon && activeSlot !== null && activeSlot !== index ? styles.graySelection : ""} ${(index === activeSlot && !fixedPokemon) ? styles.selectedSlot : ""}`}
 			style={{ border: (!fixedPokemon && activeSlot === index && pokemon) ? `5px dashed ${colors[pokemon.types[0]]}` : "" }}
 			onDragOver={handleDragOver}
 			onDrop={handleDrop}

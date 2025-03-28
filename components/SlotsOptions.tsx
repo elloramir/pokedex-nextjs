@@ -6,7 +6,7 @@
 
 import styles from "@/styles/SlotsOptions.module.css";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { useTeamContext } from "@/contexts/Team";
@@ -18,12 +18,17 @@ export function SlotsOptions() {
 	const pokemonId = slots[activeSlot];
 	const isComplete = slots.every(slot => slot !== null);
 
+	// State to control loading status
+	const [isLoading, setIsLoading] = useState(false);
+
 	function handleRemoveActiveSlot() {
 		unselectPokemon(pokemonId);
 		clearSlot(activeSlot);
 	}
 
 	function handleSaveTeam() {
+		setIsLoading(true); // Set loading state to true when the request starts
+
 		fetch("api", {
 			method: "post",
 			body: JSON.stringify({
@@ -33,10 +38,10 @@ export function SlotsOptions() {
 		})
 		.then((resp) => {
 			if (resp.status === 201) {
-				redirect("/teams");				
-			}
-			else {
+				redirect("/teams");
+			} else {
 				alert("Can't save that pokemon team");
+				setIsLoading(false);
 			}
 		});
 	}
@@ -57,13 +62,14 @@ export function SlotsOptions() {
 				/>
 			</button>
 			<button 
-				className={`${styles.buttonImage} ${styles.success} ${!isComplete ? styles.disabled : ""}`}
+				className={`${styles.buttonImage} ${styles.success} ${!isComplete || isLoading ? styles.disabled : ""}`}
 				aria-label="Select Team"
 				onClick={handleSaveTeam}
-				disabled={!isComplete}
+				disabled={!isComplete || isLoading}
 			>
 				<Image 
-					src="/images/select.png" 
+					src={isLoading ? "/images/spinner.gif" : "/images/select.png"} 
+					className={styles.bright}
 					alt="Select" 
 					width={30} 
 					height={30}
