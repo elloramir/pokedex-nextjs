@@ -22,9 +22,9 @@ export function PokemonsProvider({ children }) {
 						.then(resp => resp.json())
 						.then(props => ({
 							id: props.id,
-							name: props.name + "?v=1", // Activate cache
+							name: props.name,
 							number: props.id,
-							image: props.sprites.front_default,
+							image: props.sprites.front_default + "?v=1", // Activate cache
 							types: props.types.map(typeInfo => typeInfo.type.name),
 							selected: false
 						}))

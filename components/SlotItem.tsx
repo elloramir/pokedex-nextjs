@@ -9,6 +9,7 @@ import React, { useRef, useEffect } from "react";
 import Image from "next/image";
 import colors from "@/data/colors.json";
 import { ImageLoader } from "@/components/ImageLoader";
+import { Background } from "@/components/Background";
 import { useTeamContext } from "@/contexts/Team";
 import { usePokemonsContext } from "@/contexts/Pokemons";
 
@@ -82,29 +83,12 @@ export function SlotItem({ index, fixedPokemon }) {
 
 	// Change svg color dynamicaly every time slots change
 	useEffect(() => {
-		const updateSVGColor = () => {
-			const svg = svgRef.current?.contentDocument;
-			const path = svg?.querySelector("path");
-			const color = pokemon ? colors[pokemon.types[0]] : "#fff";
+		const svg = svgRef.current;
+		const path = svg.querySelector("path");
+		const color = pokemon ? colors[pokemon.types[0]] : "#fff";
 
-			if (path) {
-				path.setAttribute("fill", color);
-			}
-		};
-
-		// Allways try even if not loaded
-		updateSVGColor();
-
-		const svgElement = svgRef.current;
-		if (svgElement) {
-			svgElement.addEventListener("load", updateSVGColor);
-		}
-
-		return () => {
-			svgElement?.removeEventListener("load", updateSVGColor);
-		};
+		path.setAttribute("fill", color);
 	}, [slots]);
-
 
 
 	return (
@@ -126,13 +110,7 @@ export function SlotItem({ index, fixedPokemon }) {
 					style={{ objectFit: "contain" }}
 				/>
 			)}
-			{/* @NOTE(ellora): Objects are significantly slower than images and pure svg elements */}
-			<object 
-				data="/images/slot.svg"
-				type="image/svg+xml" 
-				className={styles.slotObject}
-				ref={svgRef}
-			/>
+			<Background ref={svgRef} />
 		</div>
 	);
 }
