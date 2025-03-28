@@ -64,7 +64,7 @@ export function Pokemons() {
 
     // When clicking to select
     function handleClick(pokemon) {
-        if (activeSlot !== null) {
+        if (activeSlot !== null && !pokemon.selected) {
             unselectPokemon(slots[activeSlot]);
             clearSlot(activeSlot);
             selectPokemon(pokemon.id);
